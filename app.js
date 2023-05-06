@@ -1,26 +1,34 @@
 const fastify = require('fastify')({ logger: true })
 const Redis = require("ioredis")
 
-// 声明路由
+// 共用schema
+fastify.addSchema({
+    $id: 'auth',
+    type: 'object',
+    required: ['id', 'secret'],
+    properties: {
+        id: { type: 'string' },
+        secret: { type: 'string' },
+    }
+})
+// 创建剪贴
+fastify.route({
+    method: 'POST',
+    url: '/create',
+    schema: {
+        querystring: { $ref: 'auth#' }
+    },
+    handler: async (request, reply) => {
+        return { hello: 'world' }
+    }
+})
 
 // 获取剪贴
 fastify.route({
     method: 'GET',
-    url: '/',
+    url: '/get',
     schema: {
-        // request needs to have a querystring with a `name` parameter
-        querystring: {
-            name: { type: 'string' }
-        },
-        // the response needs to be an object with an `hello` property of type 'string'
-        response: {
-            200: {
-                type: 'object',
-                properties: {
-                    hello: { type: 'string' }
-                }
-            }
-        }
+        querystring: { $ref: 'auth#' }
     },
     handler: async (request, reply) => {
         return { hello: 'world' }
@@ -30,21 +38,9 @@ fastify.route({
 //更新剪贴
 fastify.route({
     method: 'POST',
-    url: '/',
+    url: '/update',
     schema: {
-        // request needs to have a querystring with a `name` parameter
-        querystring: {
-            name: { type: 'string' }
-        },
-        // the response needs to be an object with an `hello` property of type 'string'
-        response: {
-            200: {
-                type: 'object',
-                properties: {
-                    hello: { type: 'string' }
-                }
-            }
-        }
+        querystring: { $ref: 'auth#' }
     },
     handler: async (request, reply) => {
         return { hello: 'world' }
@@ -53,22 +49,10 @@ fastify.route({
 
 //删除剪贴
 fastify.route({
-    method: 'DELETE',
-    url: '/',
+    method: 'POST',
+    url: '/delete',
     schema: {
-        // request needs to have a querystring with a `name` parameter
-        querystring: {
-            name: { type: 'string' }
-        },
-        // the response needs to be an object with an `hello` property of type 'string'
-        response: {
-            200: {
-                type: 'object',
-                properties: {
-                    hello: { type: 'string' }
-                }
-            }
-        }
+        querystring: { $ref: 'auth#' }
     },
     handler: async (request, reply) => {
         return { hello: 'world' }
